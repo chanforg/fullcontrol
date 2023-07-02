@@ -29,12 +29,13 @@ class ExtrusionGeometry(BaseExtrusionGeometry):
 
 class StationaryExtrusion(BaseStationaryExtrusion):
     'generic StationaryExtrusion with gcode method added'
+
     # gcode additions to generic StationaryExtrusion class
 
     def gcode(self, state):
         'process this instance in a list of steps supplied by the designer to generate and return a line of gcode'
         state.printer.speed_changed = True
-        return f'G1 F{self.speed} E{state.extruder.get_and_update_volume(self.volume)*state.extruder.volume_to_e:.6}'
+        return f'G1 F{self.speed} E{state.extruder.get_and_update_volume(self.volume) * state.extruder.volume_to_e:.6}'
 
 
 class Extruder(BaseExtruder):
@@ -54,28 +55,34 @@ class Extruder(BaseExtruder):
     total_volume: Optional[float]
     # total extrusion volume reference value - this attribute is set to allow extrusion to be expressed relative to this point (for relative_gcode = True, it is reset for every line)
     total_volume_ref: Optional[float]
+    extrusion_rate: Optional[float]
 
     def get_and_update_volume(self, volume):
         'DO THIS'
-        self.total_volume += volume
-        ret_val = self.total_volume-self.total_volume_ref
-        if self.relative_gcode == True:
+        if self.extrusion_rate is not None:
+            self.total_volume += volume * self.extrusion_rate
+        else:
+            self.total_volume += volume
+        ret_val = self.total_volume - self.total_volume_ref
+        if self.relative_gcode:
             self.total_volume_ref = self.total_volume
         # to make absolute extrusion work, check self.total_volume_ref and, if above a treshold value, reset extrusion (set extruder_now.e_total_vol_reference_for_gcode = extruder_now.e_total_vol; insert a G92 command next in the steplist)
         return ret_val
 
     def e_gcode(self, point1: Point, state) -> str:
         'DO THIS'
+
         def distance_forgiving(point1: Point, point2: Point) -> float:
             'return distance between two points. x, y or z components are ignored unless defined in both points'
             dist_x = 0 if point1.x == None or point2.x == None else point1.x - point2.x
             dist_y = 0 if point1.y == None or point2.y == None else point1.y - point2.y
             dist_z = 0 if point1.z == None or point2.z == None else point1.z - point2.z
-            return ((dist_x)**2+(dist_y)**2+(dist_z)**2)**0.5
+            return ((dist_x) ** 2 + (dist_y) ** 2 + (dist_z) ** 2) ** 0.5
+
         if self.on:
             # length = pt1.distance_to_self(pt2)
             length = distance_forgiving(point1, state.point)
-            return f'E{self.get_and_update_volume(length*state.extrusion_geometry.area)*self.volume_to_e:.6} '
+            return f'E{self.get_and_update_volume(length * state.extrusion_geometry.area) * self.volume_to_e:.6} '
         else:
             return ''
 
@@ -85,7 +92,7 @@ class Extruder(BaseExtruder):
             if self.units == "mm3":
                 self.volume_to_e = 1
             elif self.units == "mm":
-                self.volume_to_e = 1 / (pi*(self.dia_feed/2)**2)
+                self.volume_to_e = 1 / (pi * (self.dia_feed / 2) ** 2)
         except:
             pass
 
