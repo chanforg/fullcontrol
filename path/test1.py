@@ -2,41 +2,91 @@ import fullcontrol as fc
 
 steps = []
 layer_height = 0.4
-steps.append(fc.Extruder(extrusion_rate=0.04))
+steps.append(fc.Extruder(extrusion_rate=0.20))
 steps.append(fc.Extruder(relative_gcode=False))
-steps.append(fc.Point(x=89.9, y=109.9))
-for j in range(5):
-    steps.append(fc.Point(x=89.9, y=109.9, z=1 + j * layer_height))
-    steps.append((fc.Point(x=210.1, y=109.9)))
-    for i in range(17):
-        steps.append(fc.Point(x=210.1 - 120.2 * (i % 2), y=109.9 + 0.3 * (i + 1)))
-        steps.append(fc.Point(x=89.9 + 120.2 * (i % 2), y=109.9 + 0.3 * (i + 1)))
+steps.append(fc.Printer(print_speed=600, travel_speed=1000))
+steps.append(fc.Extruder(on=False))
+steps.append(fc.Point(x=105, y=130))
+steps.append(fc.Point(x=105, y=130, z=0.5))
+steps.append(fc.Extruder(on=True))
+for j in range(10):
+    steps.append(fc.Point(x=105, y=130, z=0.5 + j * layer_height))
+    steps.append((fc.Point(x=105, y=170)))
+    for i in range(51):
+        steps.append(fc.Point(x=105 + 0.3 * (i + 1), y=170 - 40 * (i % 2)))
+        steps.append(fc.Point(x=105 + 0.3 * (i + 1), y=130 + 40 * (i % 2)))
 
-    steps.append(fc.Point(x=89.9, y=190.1))
+    steps.extend(fc.travel_to(fc.Point(x=105, y=130, z=0.5 + j * layer_height)))
+steps.append(fc.Extruder(on=False))
+steps.append(fc.Point(x=105, y=130, z=5))
+steps.append(fc.Point(x=125, y=130))
+steps.append(fc.Point(x=125, y=130, z=0.5))
+steps.append(fc.Extruder(on=True))
+for j in range(2):
+    steps.append(fc.Point(x=125, y=130, z=0.5 + j * layer_height))
+    steps.append((fc.Point(x=175, y=130)))
+    for i in range(7):
+        steps.append(fc.Point(x=175 - 50 * (i % 2), y=130 + 0.3 * (i + 1)))
+        steps.append(fc.Point(x=125 + 50 * (i % 2), y=130 + 0.3 * (i + 1)))
 
-    for i in range(16):
-        steps.append(fc.Point(x=89.9 + 0.3 * (i + 1), y=190.1 - 75.1 * (i % 2)))
-        steps.append(fc.Point(x=89.9 + 0.3 * (i + 1), y=115 + 75.1 * (i % 2)))
+    steps.append(fc.Point(x=125, y=170))
 
-    steps.append(fc.Point(x=210.1, y=190.1))
+    for i in range(6):
+        steps.append(fc.Point(x=125 + 0.3 * (i + 1), y=170 - 37.9 * (i % 2)))
+        steps.append(fc.Point(x=125 + 0.3 * (i + 1), y=132.1 + 37.9 * (i % 2)))
 
-    for i in range(16):
-        steps.append(fc.Point(x=210.1 - 115.4 * (i % 2), y=190.1 - 0.3 * (i + 1)))
-        steps.append(fc.Point(x=94.7 + 115.4 * (i % 2), y=190.1 - 0.3 * (i + 1)))
+    steps.append(fc.Point(x=175, y=170))
 
-    steps.append(fc.Point(x=210.1, y=115))
+    for i in range(6):
+        steps.append(fc.Point(x=175 - 48.2 * (i % 2), y=170 - 0.3 * (i + 1)))
+        steps.append(fc.Point(x=126.8 + 48.2 * (i % 2), y=170 - 0.3 * (i + 1)))
 
-    for i in range(16):
-        steps.append(fc.Point(x=210.1 - 0.3 * (i + 1), y=115 + 70.3 * (i % 2)))
-        steps.append(fc.Point(x=210.1 - 0.3 * (i + 1), y=185.3 - 70.3 * (i % 2)))
+    steps.append(fc.Point(x=175, y=132.1))
+
+    for i in range(6):
+        steps.append(fc.Point(x=175 - 0.3 * (i + 1), y=132.1 + 36.1 * (i % 2)))
+        steps.append(fc.Point(x=175 - 0.3 * (i + 1), y=168.2 - 36.1 * (i % 2)))
 
     if j == 0:
-        steps.append(fc.Point(x=205, y=192))
-        for i in range(21):
-            steps.append(fc.Point(x=205 - 5 * (i + 1), y=192 - 84 * (i % 2)))
-            steps.append(fc.Point(x=205 - 5 * (i + 1), y=108 + 84 * (i % 2)))
+        steps.append(fc.Point(x=173.2, y=172))
+        for i in range(15):
+            steps.append(fc.Point(x=173.2 - 3 * (i + 1), y=172 - 44 * (i % 2)))
+            steps.append(fc.Point(x=173.2 - 3 * (i + 1), y=128 + 44 * (i % 2)))
 
-    steps.extend(fc.travel_to(fc.Point(x=89.9, y=109.9, z=1 + j * layer_height)))
+    steps.extend(fc.travel_to(fc.Point(x=125, y=130, z=0.5 + j * layer_height)))
+
+for j in range(2):
+    steps.append(fc.Point(x=125, y=130, z=3 + j * layer_height))
+    steps.append((fc.Point(x=175, y=130)))
+    for i in range(7):
+        steps.append(fc.Point(x=175 - 50 * (i % 2), y=130 + 0.3 * (i + 1)))
+        steps.append(fc.Point(x=125 + 50 * (i % 2), y=130 + 0.3 * (i + 1)))
+
+    steps.append(fc.Point(x=125, y=170))
+
+    for i in range(6):
+        steps.append(fc.Point(x=125 + 0.3 * (i + 1), y=170 - 37.9 * (i % 2)))
+        steps.append(fc.Point(x=125 + 0.3 * (i + 1), y=132.1 + 37.9 * (i % 2)))
+
+    steps.append(fc.Point(x=175, y=170))
+
+    for i in range(6):
+        steps.append(fc.Point(x=175 - 48.2 * (i % 2), y=170 - 0.3 * (i + 1)))
+        steps.append(fc.Point(x=126.8 + 48.2 * (i % 2), y=170 - 0.3 * (i + 1)))
+
+    steps.append(fc.Point(x=175, y=132.1))
+
+    for i in range(6):
+        steps.append(fc.Point(x=175 - 0.3 * (i + 1), y=132.1 + 36.1 * (i % 2)))
+        steps.append(fc.Point(x=175 - 0.3 * (i + 1), y=168.2 - 36.1 * (i % 2)))
+
+    if j == 0:
+        steps.append(fc.Point(x=173.2, y=172))
+        for i in range(15):
+            steps.append(fc.Point(x=173.2 - 3 * (i + 1), y=172 - 44 * (i % 2)))
+            steps.append(fc.Point(x=173.2 - 3 * (i + 1), y=128 + 44 * (i % 2)))
+
+    steps.extend(fc.travel_to(fc.Point(x=125, y=130, z=3 + j * layer_height)))
 
 filename = 'my_design'
 printer = 'siliconePrinter1'
